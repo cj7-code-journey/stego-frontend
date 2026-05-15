@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Steganography</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>🛡️ Image Steganography</h1>
+        <p class="subtitle">Securely hide files or text inside images</p>
+
+        <div class="tabs">
+            <button onclick="switchTab('encode')" class="active" id="tab-encode">Hide</button>
+            <button onclick="switchTab('decode')" id="tab-decode">Extract</button>
+        </div>
+
+        <div id="encode-sec" class="section active">
+            <form id="encode-form">
+                <label>Carrier Image (PNG only):</label>
+                <input type="file" id="carrier" accept=".png" required>
+
+                <label>Payload Type:</label>
+                <select id="payload-type" onchange="togglePayloadInput()">
+                    <option value="file">File / Media</option>
+                    <option value="text">Text Message</option>
+                </select>
+
+                <div id="file-input-div">
+                    <label>Secret File:</label>
+                    <input type="file" id="payload-file">
+                </div>
+
+                <div id="text-input-div" style="display: none;">
+                    <label>Secret Text:</label>
+                    <textarea id="payload-text" rows="3"></textarea>
+                </div>
+
+                <label>Passcode:</label>
+                <input type="password" id="enc-pass" required>
+
+                <button type="submit" class="btn">Hide Data & Download</button>
+            </form>
+            <p id="enc-status" class="status"></p>
+        </div>
+
+        <div id="decode-sec" class="section">
+            <form id="decode-form">
+                <label>Encrypted Image (PNG):</label>
+                <input type="file" id="stego-img" accept=".png" required>
+
+                <label>Passcode:</label>
+                <input type="password" id="dec-pass" required>
+
+                <button type="submit" class="btn">Extract Data</button>
+            </form>
+            <p id="dec-status" class="status"></p>
+
+            <div id="text-result" style="display: none; margin-top: 15px;">
+                <label>Extracted Text:</label>
+                <textarea id="extracted-text" rows="4" readonly></textarea>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
