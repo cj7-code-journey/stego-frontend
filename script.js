@@ -99,13 +99,14 @@ document.getElementById('decode-form').addEventListener('submit', async (e) => {
             // It's a text payload
             const data = await response.json();
             document.getElementById('extracted-text').value = data.data;
-            textResultDiv.style.display = 'block';
+            document.getElementById('text-result').style.display = 'block';
+            document.getElementById('media-result').style.display = 'none'; // Hide media div
             status.innerText = "Text extracted successfully.";
         } else {
-            // It's a file payload
+            // It's a file / media payload
             const blob = await response.blob();
-
-            // Extract filename from headers automatically
+            
+            // Extract filename from headers
             let filename = "extracted_file.bin";
             const disposition = response.headers.get("Content-Disposition");
             if (disposition && disposition.indexOf('filename*=UTF-8\'\'') !== -1) {
@@ -113,15 +114,40 @@ document.getElementById('decode-form').addEventListener('submit', async (e) => {
             }
 
             const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
+            
+            // DOM Elements
+            const textResultDiv = document.getElementById('text-result');
+            const mediaResultDiv = document.getElementById('media-result');
+            const mediaContainer = document.getElementById('media-container');
+            const downloadBtn = document.getElementById('download-btn');
 
-            status.innerText = "File extracted and downloaded!";
+            // Hide text div, show media div
+            textResultDiv.style.display = 'none';
+            mediaResultDiv.style.display = 'block';
+            mediaContainer.innerHTML = ''; // Clear purana preview
+            
+            // Download button ko setup karein
+            downloadBtn.href = url;
+            downloadBtn.download = filename;
+
+            // Filename se extension nikal kar preview set karein
+            const ext = filename.split('.').pop().toLowerCase();
+            
+            if (['png', 'jpg', 'jpeg', 'gif'].includes(ext)) {
+                mediaContainer.innerHTML = `<img src="${url}" style="max-width: 100%; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">`;
+            } 
+            else if (['mp4', 'webm', 'mkv', 'avi'].includes(ext)) {
+                mediaContainer.innerHTML = `<video src="${url}" controls style="max-width: 100%; border-radius: 8px;"></video>`;
+            } 
+            else if (['mp3', 'wav', 'ogg'].includes(ext)) {
+                mediaContainer.innerHTML = `<audio src="${url}" controls style="width: 100%; outline: none;"></audio>`;
+            } 
+            else {
+                // Agar PDF ya DOCX file hai jiska direct preview nahi hota
+                mediaContainer.innerHTML = `<p style="color: #555; font-size: 0.9rem;">(Preview not available for .${ext} files. Please download to view.)</p>`;
+            }
+            
+            status.innerText = "File extracted! View or download below.";
         }
         status.className = "status success";
     } catch (error) {
